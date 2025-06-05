@@ -24,7 +24,7 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    query: `{ apartments { id address pricePerNight owner { name } } }`
+                    query: `{ apartments { id address pricepernight owner { name } } }`
                 })
             });
             await res.json();

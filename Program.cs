@@ -6,11 +6,6 @@ using RentalApi.GraphQL.Queries;
 var builder = WebApplication.CreateBuilder(args);
 
 // Добавление сервисов в контейнер.
-
-// Подключение PostgreSQL через EF Core
-// builder.Services.AddDbContext<AppDbContext>(options =>
-//     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 builder.Services.AddDbContext<AppDbContext>();
 
 // Добавление REST контроллеров
@@ -24,7 +19,7 @@ builder.Services
     .AddFiltering()
     .AddSorting();
 
-// Настройка CORS (если нужно)
+// Настройка CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -36,17 +31,6 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-
-// Использование middleware
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
-
-// app.UseHttpsRedirection();
-
-// Включение статических файлов (для index.html)
-// app.UseStaticFiles();
 
 app.UseRouting();
 
@@ -60,7 +44,5 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGraphQL();     // GraphQL API
 });
 
-// Пример GET-маршрута для проверки работы сервера
-// app.MapGet("/", () => Results.Redirect("/index.html"));
 
 app.Run();
