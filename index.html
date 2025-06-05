@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>REST vs GraphQL</title>
+</head>
+<body>
+    <h2>Тестирование REST vs GraphQL</h2>
+    <button onclick="testRest()">Запрос через REST</button>
+    <button onclick="testGraphql()">Запрос через GraphQL</button>
+    <p id="result"></p>
+
+    <script>
+        async function testRest() {
+            const start = performance.now();
+            const res = await fetch('http://localhost:5074/apartment'); 
+            await res.json();
+            const end = performance.now();
+            document.getElementById('result').innerText = `REST: ${end - start} мс`;
+        }
+
+        async function testGraphql() {
+            const start = performance.now();
+            const res = await fetch('http://localhost:5074/graphql',  {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: `{ apartments { id address pricePerNight owner { name } } }`
+                })
+            });
+            await res.json();
+            const end = performance.now();
+            document.getElementById('result').innerText += `\nGraphQL: ${end - start} мс`;
+        }
+    </script>
+</body>
+</html>

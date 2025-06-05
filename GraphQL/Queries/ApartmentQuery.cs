@@ -1,11 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using HotChocolate;
 
-[ExtendObjectType("Query")]
-public class ApartmentQuery
+namespace RentalApi.GraphQL.Queries
 {
-    [UseProjection]
-    public IQueryable<Apartment> GetApartments([Service] AppDbContext context)
+    public class ApartmentQuery
+
     {
-        return context.Apartments.Include(a => a.Owner);
+        [UseProjection]
+        public IQueryable<Apartment> GetApartments([Service] AppDbContext context)
+        {
+            return context.Apartments.Include(a => a.Owner);
+        }
     }
 }
