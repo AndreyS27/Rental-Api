@@ -5,31 +5,115 @@
 </head>
 <body>
     <h2>Тестирование REST vs GraphQL</h2>
-    <button onclick="testRest()">Запрос через REST</button>
-    <button onclick="testGraphql()">Запрос через GraphQL</button>
+    
+    <h3>Сценарий 1: Получение информации о всех квартирах</h3>
+    <button onclick="testRestScenario1()">REST — квартиры</button>
+    <button onclick="testGraphqlScenario1()">GraphQL — квартиры</button>
+
+    <h3>Сценарий 2: Фильтрация квартир по цене</h3>
+    <button onclick="testRestScenario2()">REST — фильтр</button>
+    <button onclick="testGraphqlScenario2()">GraphQL — фильтр</button>
+
+    <h3>Сценарий 3: Обновление данных пользователя</h3>
+    <button onclick="testRestScenario3()">REST — обновить</button>
+    <button onclick="testGraphqlScenario3()">GraphQL — обновить</button>
+
     <p id="result"></p>
 
     <script>
-        async function testRest() {
+        function logResult(text) {
+            const result = document.getElementById('result');
+            result.innerText += text + '\n';
+        }
+
+        async function testRestScenario1() {
             const start = performance.now();
             const res = await fetch('http://localhost:5074/apartment'); 
             await res.json();
             const end = performance.now();
-            document.getElementById('result').innerText = `REST: ${end - start} мс`;
+            logResult(`REST Сценарий 1: ${end - start} мс`);
         }
 
-        async function testGraphql() {
+        async function testGraphqlScenario1() {
             const start = performance.now();
             const res = await fetch('http://localhost:5074/graphql',  {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    query: `{ apartments { id address pricepernight owner { name } } }`
+                    query: `{ apartments { id address pricepernight owner { id name email } } }`
                 })
             });
             await res.json();
             const end = performance.now();
-            document.getElementById('result').innerText += `\nGraphQL: ${end - start} мс`;
+            logResult(`GraphQL Сценарий 1: ${end - start} мс`);
+        }
+
+        async function testRestScenario2() {
+            const start = performance.now();
+            const res = await fetch('http:/localhost:5074/apartment/filtered?maxPrice=5000');
+            await res.json();
+            const end = performance.now();
+            logResult(`REST Сценарий 2: ${end - start} мс`);
+        }
+
+        async function testGraphqlScenario2() {
+            const start = performance.now();
+            const res = await fetch('http://localhost:5074/graphql', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    query: `query GetFilteredApartments($maxPrice: Decimal!){
+                        apartments(filter: {maxPrice: $maxPrice}) {
+                        id address pricepernight
+                        }
+                    }`,
+                    variables: {
+                        maxPrice: 5000
+                    }
+                })
+            });
+            await res.json();
+            const end = performance.now();
+            logResult(`GraphQL Сценарий 2: ${end - start} мс`);
+        }
+
+        async function testRestScenario3() {
+            const start = performance.now();
+            const res = await fetch('http://localhost:5074/user/1', {
+                method: 'PUT',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    name: "new name rest",
+                    email: "new-email-rest@email.com"
+                })
+            });
+            await res.json();
+            const end = performance.now();
+            logResult(`REST Сценарий 3: ${end - start} мс`);
+        }
+
+        async function testGraphqlScenario3(params) {
+            const start = performance.now();
+            const res = await fetch('http://localhost:5074/graphql', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    query: `mutation UpdateUser($id: Int!, $name: String!, $email: String!) {
+                    updateUser(id: $id, input: {name: $name, email: $email }) {
+                        success
+                        user { id name email }
+                        }
+                    }`,
+                    variables: {
+                        id: 1,
+                        name: "new name GraphQL",
+                        email: "new-email-graphql@email.com"
+                    }
+                })
+            });
+            await res.json();
+            const end = performance.now();
+            logResult(`GraphQL Сценарий 3: ${end - start} мс`);
         }
     </script>
 </body>

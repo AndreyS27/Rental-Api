@@ -11,9 +11,21 @@ public class ApartmentController : ControllerBase
     {
         _context = context;
     }
+
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _context.Apartments.Include(a => a.Owner).ToListAsync());
+    }
+
+    [HttpGet("filtered")]
+    public async Task<IActionResult> GetFiltered(decimal maxPrice)
+    {
+        var apartments = await _context.Apartments
+            .Where(a => a.pricepernight <= maxPrice)
+            .Include(a => a.Owner)
+            .ToListAsync();
+
+        return Ok(apartments);
     }
 }
