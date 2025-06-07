@@ -19,6 +19,11 @@ builder.Services.AddControllers()
 builder.Services
     .AddGraphQLServer()
     .AddQueryType<ApartmentQuery>()
+    .AddMutationType<UserMutation>()
+    .AddType<ApartmentType>()
+    .AddType<UserType>()
+    .AddType<ApartmentFilterInputType>()
+    .AddType<UserInputType>()
     .AddProjections()
     .AddFiltering()
     .AddSorting();

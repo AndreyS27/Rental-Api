@@ -11,5 +11,21 @@ namespace RentalApi.GraphQL.Queries
         {
             return context.Apartments.Include(a => a.Owner);
         }
+
+
+        [UseProjection]
+        public IQueryable<Apartment> GetFilteredApartments(
+                [Service] AppDbContext context,
+                ApartmentFilter filter)
+        {
+            var query = context.Apartments.Include(a => a.Owner).AsQueryable();
+
+            if (filter.MaxPrice.HasValue)
+            {
+                query = query.Where(a => a.pricepernight < filter.MaxPrice.Value);
+            }
+
+            return query;
+        }
     }
 }
